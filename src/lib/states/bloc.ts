@@ -1,31 +1,51 @@
 import { writable } from 'svelte/store';
-import CounterState, { CounterStatus } from './state';
+import CounterState from './state';
 import type CounterEvent from './event';
 
-export const counterState = writable<CounterState>(
-	new CounterState(CounterStatus.Initial, 0),
-);
-
-enum Repositories {}
+export const counterState = writable<CounterState>(new CounterState('Initial', 0));
 
 export default class Bloc {
-	private constructor() {}
-	private static _instance: Bloc;
-	private static _childrens: unknown[];
+    private static _instance: Bloc | undefined;
+    private constructor(private _childrens: Children) {}
 
-	private static getChild<T>(repositories: Repositories): T {
-		return this._childrens[repositories] as T;
-	}
+    static getInstance(children: Children): Bloc {
+        this._instance = new Bloc(children);
+        return this._instance;
+    }
 
-	static getInstance(children: unknown[]): Bloc {
-		this._instance = new Bloc();
-		this._childrens = children;
-		return this._instance;
-	}
+    private getChild<K extends Keys>(key: K): TChild<K> {
+        return this._childrens[key] as TChild<K>;
+    }
 
-	set counterEventSink(e: CounterEvent) {
-		e.update();
-	}
+    set setCounterEvent(e: CounterEvent) {
+        e.update();
+    }
 }
 
-export const bloc = Bloc.getInstance([]);
+export const bloc = Bloc.getInstance({
+    c: {},
+    s: {},
+    r: {}
+});
+
+interface Configs {
+    c: {};
+}
+
+interface Repositories {
+    r: {};
+}
+
+interface DataSources {
+    s: {};
+}
+
+type Children = DataSources & Repositories & Configs;
+type Keys = keyof Children;
+type TChild<T extends Keys> = T extends 's'
+    ? Children['s']
+    : T extends 'r'
+    ? Children['r']
+    : T extends 'c'
+    ? Children['c']
+    : never;

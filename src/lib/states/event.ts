@@ -1,22 +1,18 @@
 import { counterState } from './bloc';
-import CounterState, { CounterStatus } from './state';
+import CounterState from './state';
 
 export default class CounterEvent {
-	update() {}
+    update() {}
 }
 
 export class IncrementEvent implements CounterEvent {
-	update() {
-		counterState.update((prev) =>
-			CounterState.copyWith(CounterStatus.Increment, prev.value + 1)
-		);
-	}
+    update() {
+        counterState.update((prev) => CounterState.copyWith('Increment', prev.value + 1));
+    }
 }
 
 export class DecrementEvent implements CounterEvent {
-	update() {
-		counterState.update((prev) =>
-			CounterState.copyWith(CounterStatus.Decrement, prev.value - 1)
-		);
-	}
+    update() {
+        counterState.update((prev) => CounterState.copyWith('Decrement', prev.value - 1));
+    }
 }
