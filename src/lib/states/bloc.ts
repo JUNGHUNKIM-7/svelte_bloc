@@ -1,51 +1,53 @@
-import { writable } from 'svelte/store';
-import CounterState from './state';
-import type CounterEvent from './event';
-
-export const counterState = writable<CounterState>(new CounterState('Initial', 0));
+import type { CounterEvent } from "./event";
 
 export default class Bloc {
-    private static _instance: Bloc | undefined;
-    private constructor(private _childrens: Children) {}
+	private static _instance?: Bloc;
+	private constructor(private _childrens: Children) { }
 
-    static getInstance(children: Children): Bloc {
-        this._instance = new Bloc(children);
-        return this._instance;
-    }
+	static getInstance(children: Children): Bloc {
+		this._instance = new Bloc(children);
+		return this._instance;
+	}
 
-    private getChild<K extends Keys>(key: K): TChild<K> {
-        return this._childrens[key] as TChild<K>;
-    }
+	private getChild<K extends Keys>(key: K): TChild<K> {
+		return this._childrens[key] as TChild<K>;
+	}
 
-    set setCounterEvent(e: CounterEvent) {
-        e.update();
-    }
+	private needInitialize<C extends { children?: Omit<Children, 's'> }>(c: C, init: () => void) {
+		if (c.children === undefined) {
+			init();
+		}
+	}
+
+	set setCounterEvent(e: CounterEvent) {
+		this.needInitialize(e, () => e.init(this._childrens))
+		e.update()
+	}
 }
 
-export const bloc = Bloc.getInstance({
-    c: {},
-    s: {},
-    r: {}
-});
-
 interface Configs {
-    c: {};
+	c: {};
 }
 
 interface Repositories {
-    r: {};
+	r: {};
 }
 
 interface DataSources {
-    s: {};
+	s: {};
 }
 
-type Children = DataSources & Repositories & Configs;
+const children: Children = {
+	c: {},
+	s: {},
+	r: {}
+}
+
+export type Children = DataSources & Repositories & Configs;
 type Keys = keyof Children;
-type TChild<T extends Keys> = T extends 's'
-    ? Children['s']
-    : T extends 'r'
-    ? Children['r']
-    : T extends 'c'
-    ? Children['c']
-    : never;
+type TChild<T extends Keys> = T extends 's' ? Children['s']
+	: T extends 'r' ? Children['r']
+	: T extends 'c' ? Children['c']
+	: never;
+
+export const bloc = Bloc.getInstance(children)
