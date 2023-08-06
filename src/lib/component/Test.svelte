@@ -7,5 +7,5 @@
 <div>{$counterState.status}</div>
 <div>{$counterState.value}</div>
 
-<button on:click={() => (bloc.setEvent = new IncrementEvent())}>increment</button>
-<button on:click={() => (bloc.setEvent = new DecrementEvent())}>decrement</button>
+<button on:click={() => (bloc.setCounterEvent = new IncrementEvent())}>increment</button>
+<button on:click={() => (bloc.setCounterEvent = new DecrementEvent())}>decrement</button>
