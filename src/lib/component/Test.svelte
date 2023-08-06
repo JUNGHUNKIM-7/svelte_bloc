@@ -1,7 +1,7 @@
 <script>
-    import { bloc } from '$lib/states/bloc';
-    import { DecrementEvent, IncrementEvent } from '$lib/states/event';
-    import { counterState } from '$lib/states/state';
+    import { bloc } from '$lib/blocs/bloc';
+    import { DecrementEvent, IncrementEvent } from '$lib/blocs/counter/event';
+    import { counterState } from '$lib/blocs/counter/state';
 </script>
 
 <div>{$counterState.status}</div>
