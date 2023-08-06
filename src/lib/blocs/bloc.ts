@@ -1,9 +1,10 @@
 import { Cfg } from '$lib/utils/config';
 import { Db } from '$lib/utils/db';
 import { Ds } from '$lib/utils/ds';
-import type { CounterEvent } from './counter/event';
+import type { Children, ChildrenKeys, DataSources, TChild } from './types';
+import type CounterEvent from './counter/event';
 
-export default class Bloc {
+class Bloc {
     static #instance?: Bloc;
     private constructor(private _childrens: Children) { }
 
@@ -28,45 +29,15 @@ export default class Bloc {
     }
 }
 
-interface Configs {
+const getChildren: (dataSources: DataSources) => Children = (dataSources: DataSources) => ({
     c: {
-        cfg: Cfg
-    };
-}
-
-interface Repositories {
+        cfg: new Cfg()
+    },
     r: {
-        db: Db
-    };
-}
-
-interface DataSources {
-    ds: Ds
-}
-
-const getChildren: (dataSources: DataSources) => Children = (dataSources: DataSources) => {
-    return {
-        c: {
-            cfg: new Cfg()
-        },
-        r: {
-            db: new Db(dataSources.ds)
-        }
+        db: new Db(dataSources.ds)
     }
-}
+})
 
-export type Children = Repositories & Configs;
-export type ChildrenKeys = keyof Children;
-type TChild<T extends ChildrenKeys> = T extends 'r'
-    ? Children['r']
-    : T extends 'c'
-    ? Children['c']
-    : never;
-
-export type ErrMessage = {
-    [P in ChildrenKeys as `err_${P}`]: `${P}_is_undefined`
-}
-
-export const bloc = Bloc.getInstance(getChildren({
+export default Bloc.getInstance(getChildren({
     ds: new Ds()
 }))

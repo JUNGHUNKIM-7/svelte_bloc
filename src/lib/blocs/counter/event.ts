@@ -1,39 +1,24 @@
-import type { Children, ChildrenKeys, ErrMessage } from '../bloc';
+import BaseEvent from '../event';
+import CounterState, { counterState } from './state';
 
-export abstract class CounterEvent {
-	abstract update(): void
-
-	children?: Children
-
-	init(c: Children): void {
-		this.children = c
-		if (this.children === undefined) {
-			throw new Error("CounterEvent's children are still undefined")
-		}
+export default abstract class CounterEvent extends BaseEvent {
+	constructor() {
+		super()
 	}
-
-	private getChild<K extends ChildrenKeys>(
-		k: K,
-		err: K extends 'r' ? ErrMessage['err_r'] : ErrMessage['err_c']
-	): Children[K] {
-		if (this.children === undefined) {
-			throw new Error(err)
-		}
-		return this.children[k]
-	}
-
-	get getCfg() {
-		return this.getChild('c', "c_is_undefined").cfg
-	}
-
-	get getDb() {
-		return this.getChild('r', "r_is_undefined").db
-	}
-
 }
+
 export class IncrementEvent extends CounterEvent {
 	update(): void {
-		throw new Error('Method not implemented.');
+		counterState.update((prev) => CounterState.copyWith('increment', prev.value + 1))
+	}
+	constructor() {
+		super()
+	}
+}
+
+export class DecrementEvent extends CounterEvent {
+	update(): void {
+		counterState.update((prev) => CounterState.copyWith('decrement', prev.value - 1))
 	}
 	constructor() {
 		super()
