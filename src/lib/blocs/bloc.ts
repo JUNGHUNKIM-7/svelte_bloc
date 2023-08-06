@@ -40,12 +40,18 @@ interface Repositories {
     };
 }
 
-const children: Children = {
-    c: {
-        cfg: new Cfg()
-    },
-    r: {
-        db: new Db(new Ds())
+interface DataSources {
+    ds: Ds
+}
+
+const getChildren: (dataSources: DataSources) => Children = (dataSources: DataSources) => {
+    return {
+        c: {
+            cfg: new Cfg()
+        },
+        r: {
+            db: new Db(dataSources.ds)
+        }
     }
 }
 
@@ -61,4 +67,6 @@ export type ErrMessage = {
     [P in ChildrenKeys as `err_${P}`]: `${P}_is_undefined`
 }
 
-export const bloc = Bloc.getInstance(children)
+export const bloc = Bloc.getInstance(getChildren({
+    ds: new Ds()
+}))

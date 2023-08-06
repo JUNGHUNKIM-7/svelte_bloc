@@ -1,5 +1,4 @@
 import type { Children, ChildrenKeys, ErrMessage } from '../bloc';
-import CounterState, { counterState } from './state';
 
 export abstract class CounterEvent {
 	abstract update(): void
