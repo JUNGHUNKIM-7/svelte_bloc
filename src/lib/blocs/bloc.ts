@@ -12,11 +12,11 @@ export default class Bloc {
         return this.#instance;
     }
 
-    private getChild<K extends Keys>(key: K): TChild<K> {
+    private getChild<K extends ChildrenKeys>(key: K): TChild<K> {
         return this._childrens[key] as TChild<K>;
     }
 
-    private needInitialize<C extends { children?: ExcludedDataSource }>(c: C, init: () => void) {
+    private needInitialize<C extends { children?: Children }>(c: C, init: () => void) {
         if (c.children === undefined) {
             init();
         }
@@ -40,35 +40,25 @@ interface Repositories {
     };
 }
 
-interface DataSources {
-    s: {
-        ds: Ds
-    };
-}
-
 const children: Children = {
     c: {
         cfg: new Cfg()
     },
-    s: {
-        ds: new Ds()
-    },
     r: {
-        db: new Db()
+        db: new Db(new Ds())
     }
 }
 
-export type Children = DataSources & Repositories & Configs;
-type Keys = keyof Children;
-type TChild<T extends Keys> = T extends 's' ? Children['s']
-    : T extends 'r' ? Children['r']
-    : T extends 'c' ? Children['c']
+export type Children = Repositories & Configs;
+export type ChildrenKeys = keyof Children;
+type TChild<T extends ChildrenKeys> = T extends 'r'
+    ? Children['r']
+    : T extends 'c'
+    ? Children['c']
     : never;
 
-export type ExcludedDataSource = Omit<Children, 's'>
-export type ExcludedDataSourceKey = keyof ExcludedDataSource
 export type ErrMessage = {
-    [P in ExcludedDataSourceKey as `err_${P}`]: `${P}_is_undefined`
+    [P in ChildrenKeys as `err_${P}`]: `${P}_is_undefined`
 }
 
 export const bloc = Bloc.getInstance(children)

@@ -1,3 +1,1 @@
-export class Cfg {
-
-}
+export class Cfg {}

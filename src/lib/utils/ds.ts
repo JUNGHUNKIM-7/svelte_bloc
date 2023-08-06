@@ -1,5 +1,3 @@
 export class Ds {
-    runDs() {
-
-    }
+    runDs() {}
 }
