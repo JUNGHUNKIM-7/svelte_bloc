@@ -5,7 +5,6 @@ export abstract class CounterEvent {
 	children?: Omit<Children, 's'>
 
 	init(c: Children): void {
-		console.log("intiailzied")
 		this.children = c
 		if (this.children === undefined) {
 			throw new Error("CounterEvent's children are still undefined")
